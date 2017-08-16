@@ -27,8 +27,8 @@ function startApp() {
       console.log("********************");
       console.log("*     BAMAZON!     *");
       console.log("********************");
-      console.log("ID   | Product         | Price  ");
-      console.log("----- ----------------- --------");
+      console.log("ID   | Product                     | Price  ");
+      console.log("----- ----------------------------- --------");
       for( i = 0 ; i < data.length ; i++){
         console.log(data[i].id + "     ", data[i].product_name + "   ", "$" + data[i].price);
       }
@@ -44,11 +44,19 @@ function startApp() {
       type: "input",
       message: "Enter how many to buy: ",
       name: "quantity"
+    },
+    {
+      type: "confirm",
+      message: "Confirm order?",
+      name: "doIt"
     }
   ]).then(function(inq) {
-    let query = "SELECT "
-    connection.query(query, function(err, data) {
-
+    let query = "SELECT id, product_name, price, stock_quantity FROM products WHERE ?"
+    connection.query(query,{id: inq.product}, function(err, data) {
+      if (err) throw err;
+      if(inq.quantity <= data[0].quantity){
+        // reduce inventory by the amount purchased
+      }
     })
   })
 connection.end();
