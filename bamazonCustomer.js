@@ -21,15 +21,37 @@ connection.connect(function(err){
 });
 
 function startApp() {
-console.log("********************");
-console.log("*     BAMAZON!     *");
-console.log("********************");
-inquirer
-.prompt([
-  {
-    // display list of items from the products table
-  }
-])
+  var query = "SELECT id, product_name, price FROM products";
+  var showTheGoods = connection.query(query, function(err,data) {
+      if (err) throw err;
+      console.log("********************");
+      console.log("*     BAMAZON!     *");
+      console.log("********************");
+      console.log("ID   | Product         | Price  ");
+      console.log("----- ----------------- --------");
+      for( i = 0 ; i < data.length ; i++){
+        console.log(data[i].id + "     ", data[i].product_name + "   ", "$" + data[i].price);
+      }
+  })
+  inquirer
+  .prompt([
+    {
+      type: "input",
+      message: "Enter the ID of the Product to Buy: ",
+      name: "product"
+    },
+    {
+      type: "input",
+      message: "Enter how many to buy: ",
+      name: "quantity"
+    }
+  ]).then(function(inq) {
+    let query = "SELECT "
+    connection.query(query, function(err, data) {
+
+    })
+  })
+connection.end();
 }
 
 
