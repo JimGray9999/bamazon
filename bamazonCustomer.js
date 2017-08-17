@@ -1,5 +1,6 @@
 var mysql = require('mysql');
 var inquirer = require("inquirer");
+require('console.table');
 require('dotenv').config();
 
 var connection = mysql.createConnection({
@@ -17,7 +18,6 @@ var connection = mysql.createConnection({
 connection.connect(function(err){
   if (err) throw err;
   console.log("connected to : " + connection.threadId);
-  startApp();
 });
 
 function startApp() {
@@ -27,12 +27,8 @@ function startApp() {
       console.log("********************");
       console.log("*     BAMAZON!     *");
       console.log("********************");
-      console.log("ID   | Product                     | Price  ");
-      console.log("----- ----------------------------- --------");
-      for( i = 0 ; i < data.length ; i++){
-        console.log(data[i].id + "     ", data[i].product_name + "   ", "$" + data[i].price);
-      }
-  })
+
+      console.table(data);
   inquirer
   .prompt([
     {
@@ -51,16 +47,31 @@ function startApp() {
       name: "doIt"
     }
   ]).then(function(inq) {
+    processOrder(inq.product, inq.quantity);
+  })
+})
+
+  function processOrder(id, quantity) {
     let query = "SELECT id, product_name, price, stock_quantity FROM products WHERE ?"
-    connection.query(query,{id: inq.product}, function(err, data) {
+    connection.query(query,{id: id}, function(err, data) {
       if (err) throw err;
-      if(inq.quantity <= data[0].quantity){
-        // reduce inventory by the amount purchased
+      var cost = quantity * data[0].price;
+      var productName = data[0].product_name;
+      if(quantity <= data[0].stock_quantity){
+        let query = "UPDATE products SET stock_quantity = stock_quantity - ?";
+        query += " WHERE id = ?";
+        connection.query(query,[quantity, id], function(err, data){
+          console.log("Order Placed!");
+          console.log("Purchased " + quantity + "  " + productName);
+          console.log("Total Cost: " + "$" + cost);
+          startApp();
+        })
+      } else {
+        console.log("Insuffient Inventory, try again or contact a Bamazon Manager");
+        startApp();
       }
     })
-  })
-connection.end();
+  }
 }
 
-
-
+startApp();
