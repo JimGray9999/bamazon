@@ -1,7 +1,7 @@
-var mysql = require('mysql');
+var mysql = require("mysql");
 var inquirer = require("inquirer");
-require('console.table');
-require('dotenv').config();
+var Table = require("easy-table");
+require("dotenv").config();
 
 var connection = mysql.createConnection({
   host: process.env.DB_HOST,
@@ -21,17 +21,18 @@ connection.connect(function(err){
 });
 
 function startApp() {
-  var query = "SELECT id, product_name, price FROM products";
+  var query = "SELECT * FROM products";
   
-  var showTheGoods = connection.query(query, function(err,data) {
+  var showTheGoods = connection.query(query, function(err, res) {
       if (err) throw err;
-      console.log("********************");
-      console.log("*     BAMAZON!     *");
-      console.log("********************");
+  console.log("********************");
+  console.log("*     BAMAZON!     *");
+  console.log("********************");
 
-      // prints out the table of products in a clean row
-      // using the console.table npm package
-      console.table(data);
+  // prints out the table of products in a clean row
+  // using the console.table npm package
+  console.log(Table.print(res));
+
   inquirer
   .prompt([
     {
@@ -85,7 +86,7 @@ function startApp() {
               name: "nextOrder"
             }
           ]).then(function(inq) {
-            if(inq.nextOrder === true){
+            if(inq.nextOrder){
               startApp(); // reload application after successful purchase
             } else {
               // close application if customer is finished
