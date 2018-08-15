@@ -1,6 +1,6 @@
-var mysql = require("mysql");
+var mysql    = require("mysql");
 var inquirer = require("inquirer");
-var Table = require("easy-table");
+var Table    = require("easy-table");
 require("dotenv").config();
 
 var connection = mysql.createConnection({
@@ -14,6 +14,8 @@ var connection = mysql.createConnection({
   password: process.env.DB_PASS,
   database: "bamazon"
 });
+
+// this is a test comment
 
 connection.connect(function(err){
   if (err) throw err;
